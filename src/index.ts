@@ -1,26 +1,30 @@
 import { generate } from "ezog/cloudflare"
 
-const fetchAsArrayBuffer = async url => await fetch(url).then(async res => await res.arrayBuffer())
-const baseUrl = "https://ideoxan.com/"
+export interface Env {} // KV and durable objects
+
+const rFetch = async (url: string): Promise<ArrayBuffer> =>
+    await fetch(url).then(async res => await res.arrayBuffer())
+
+const baseUrl: string = "https://ideoxan.com/"
 
 export default {
-    async fetch(request, env, ctx) {
-        let url = new URL(request.url)
-        let cache = caches.default
+    async fetch(request: Response, env: Env, ctx: ExecutionContext): Promise<Response> {
+        let url: URL = new URL(request.url)
+        let cache: Cache = caches.default
 
         // Reject favicon requests
         if (url.pathname === "/favicon.ico") return new Response(null, { status: 404 })
 
         // Check if the request is already cached
         if (url.searchParams.get("force") != "true") {
-            let cachedResponse = await cache.match(url)
+            let cachedResponse: Response | undefined = await cache.match(url)
             if (cachedResponse) return cachedResponse
         } else await cache.delete(url)
 
-        let logo = fetchAsArrayBuffer(`${baseUrl}images/ix_logo_white_trans_253x50.png`)
-        let background = fetchAsArrayBuffer(`${baseUrl}images/og_bg.png`)
+        let logo: Promise<ArrayBuffer> = rFetch(`${baseUrl}images/ix_logo_white_trans_253x50.png`)
+        let background: Promise<ArrayBuffer> = rFetch(`${baseUrl}images/og_bg.png`)
 
-        const png = await generate(
+        const png: Uint8Array = await generate(
             [
                 {
                     type: "image",
@@ -89,7 +93,7 @@ export default {
                 background: "#fff",
             }
         )
-        let response = new Response(png, {
+        let response: Response = new Response(png, {
             headers: {
                 "Content-Type": "image/png",
                 "Cache-Control": "s-maxage=604800",

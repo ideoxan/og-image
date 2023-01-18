@@ -13,6 +13,7 @@
         "format": "prettier --write ."
     },
     "dependencies": {
-        "ezog": "^0.4.0"
+        "ezog": "^0.4.0",
+        "typescript": "^4.9.4"
     }
 }
