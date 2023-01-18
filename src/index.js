@@ -1,5 +1,8 @@
 import { generate } from "ezog/cloudflare"
 
+const fetchAsArrayBuffer = async url => await fetch(url).then(async res => await res.arrayBuffer())
+const baseUrl = "https://ideoxan.com/"
+
 export default {
     async fetch(request, env, ctx) {
         let url = new URL(request.url)
@@ -14,18 +17,14 @@ export default {
             if (cachedResponse) return cachedResponse
         } else await cache.delete(url)
 
-        let logoArrayBuffer = fetch(
-            "https://ideoxan.com/images/ix_logo_white_trans_253x50.png"
-        ).then(async res => await res.arrayBuffer())
-        let backgroundArrayBuffer = fetch("https://ideoxan.com/images/og_bg.png").then(
-            async res => await res.arrayBuffer()
-        )
+        let logo = fetchAsArrayBuffer(`${baseUrl}images/ix_logo_white_trans_253x50.png`)
+        let background = fetchAsArrayBuffer(`${baseUrl}images/og_bg.png`)
 
         const png = await generate(
             [
                 {
                     type: "image",
-                    buffer: await backgroundArrayBuffer,
+                    buffer: await background,
                     x: 0,
                     y: 0,
                     width: 800,
@@ -33,7 +32,7 @@ export default {
                 },
                 {
                     type: "image",
-                    buffer: await logoArrayBuffer,
+                    buffer: await logo,
                     x: 64,
                     y: 140,
                     width: 76,
