@@ -3,9 +3,16 @@ import { generate } from "ezog/cloudflare"
 export default {
     async fetch(request, env, ctx) {
         let url = new URL(request.url)
+        let cache = caches.default
 
         // Reject favicon requests
         if (url.pathname === "/favicon.ico") return new Response(null, { status: 404 })
+
+        // Check if the request is already cached
+        if (url.searchParams.get("force") != "true") {
+            let cachedResponse = await cache.match(url)
+            if (cachedResponse) return cachedResponse
+        } else await cache.delete(url)
 
         let logoArrayBuffer = fetch(
             "https://ideoxan.com/images/ix_logo_white_trans_253x50.png"
@@ -83,10 +90,16 @@ export default {
                 background: "#fff",
             }
         )
-        return new Response(png, {
+        let response = new Response(png, {
             headers: {
                 "Content-Type": "image/png",
+                "Cache-Control": "s-maxage=604800",
             },
         })
+
+        // Cache the response
+        await cache.put(url, response.clone())
+
+        return response
     },
 }
