@@ -7,7 +7,7 @@
     },
     "private": true,
     "scripts": {
-        "dev": "wrangler dev",
+        "dev": "wrangler dev --local",
         "format": "prettier --write ."
     },
     "dependencies": {
