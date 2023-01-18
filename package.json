@@ -7,8 +7,7 @@
     },
     "private": true,
     "scripts": {
-        "start": "wrangler dev",
-        "deploy": "wrangler publish",
+        "dev": "wrangler dev",
         "format": "prettier --write ."
     },
     "dependencies": {
